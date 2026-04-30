@@ -1,26 +1,59 @@
 import streamlit as st
 import pickle
+import os
 
-# Load model
-model = pickle.load(open('spam_model.pkl', 'rb'))
-vectorizer = pickle.load(open('vectorizer.pkl', 'rb'))
+# -------------------------------
+# Sidebar (Project Info)
+# -------------------------------
+st.sidebar.title("📌 ML PROJECT")
 
-st.title("📧 Email Spam Classifier")
+st.sidebar.markdown("""
+### 👨‍💻 Team Members
+- Avaneesh Reddy
+- Mateti Karthik
 
-st.write("Check whether an email is Spam or Ham")
+### 📚 Course
+Machine Learning  
 
-# Input box
-user_input = st.text_area("Enter your email text:")
+### 👨‍🏫 Instructor
+Mariya Celin T 
+""")
 
-if st.button("Predict"):
-    if user_input.strip() == "":
-        st.warning("Please enter some text")
-    else:
-        input_data = [user_input]
-        vector_input = vectorizer.transform(input_data)
-        prediction = model.predict(vector_input)
+# -------------------------------
+# Load Model Safely
+# -------------------------------
+if not os.path.exists("spam_model.pkl") or not os.path.exists("vectorizer.pkl"):
+    st.error("Model files not found. Please check deployment.")
+else:
+    model = pickle.load(open("spam_model.pkl", "rb"))
+    vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-        if prediction[0] == 1:
-            st.success("✅ Ham Mail (Not Spam)")
+    # -------------------------------
+    # Main UI
+    # -------------------------------
+    st.title("📧 Email Spam Classifier")
+
+    st.write("Check whether an email is Spam or Ham")
+
+    # Input box
+    user_input = st.text_area("Enter your email text:")
+
+    # Predict button
+    if st.button("Predict"):
+        if user_input.strip() == "":
+            st.warning("Please enter some text")
         else:
-            st.error("🚨 Spam Mail")
+            input_data = [user_input]
+            vector_input = vectorizer.transform(input_data)
+            prediction = model.predict(vector_input)
+
+            if prediction[0] == 1:
+                st.success("✅ Ham Mail (Not Spam)")
+            else:
+                st.error("🚨 Spam Mail")
+
+# -------------------------------
+# Footer
+# -------------------------------
+st.markdown("---")
+st.caption("Built by Avaneesh & Karthik| ML Project 🚀")
